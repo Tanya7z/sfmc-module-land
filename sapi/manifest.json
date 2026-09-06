@@ -6,7 +6,10 @@
   "configKey": "land",
   "enabledByDefault": true,
   "canDisable": true,
-  "requires": ["economy", "activity-log"],
+  "requires": [
+    "economy",
+    "activity-log"
+  ],
   "permissions": [
     "config:read:land",
     "db:read:sfmc_lands",
@@ -19,7 +22,6 @@
     "db:write:sfmc_land_guestbook",
     "db:read:sfmc_land_operations",
     "db:write:sfmc_land_operations",
-    "command:land",
     "service:land.byId",
     "service:land.byPos",
     "service:land.listByOwner",
@@ -50,35 +52,197 @@
   ],
   "services": {
     "provides": [
-      { "name": "land.byId", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.byPos", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.listByOwner", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.listMembers", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.getPlayerRole", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.validateBox", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.createLease", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.renewLease", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.expandLease", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.terminateLease", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.teleport", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.leaseStatus", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.getPerks", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.setPerk", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.guestbook.list", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.guestbook.sign", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.auditLog", "input": { "type": "object" }, "output": { "type": "object" } },
-      { "name": "land.openMainMenu", "input": { "type": "object" }, "output": { "type": "object" } }
+      {
+        "name": "land.byId",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.byPos",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.listByOwner",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.listMembers",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.getPlayerRole",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.validateBox",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.createLease",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.renewLease",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.expandLease",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.terminateLease",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.teleport",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.leaseStatus",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.getPerks",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.setPerk",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.guestbook.list",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.guestbook.sign",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.auditLog",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      },
+      {
+        "name": "land.openMainMenu",
+        "input": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        }
+      }
     ],
     "requires": [
-      { "name": "economy.account.get" },
-      { "name": "economy.account.debit" },
-      { "name": "economy.account.credit" },
-      { "name": "activity.record" },
-      { "name": "activity.query" },
-      { "name": "area.registerArea" },
-      { "name": "area.unregisterArea" },
-      { "name": "area.registerFeature" },
-      { "name": "gui.registerMenuItem" }
+      {
+        "name": "economy.account.get"
+      },
+      {
+        "name": "economy.account.debit"
+      },
+      {
+        "name": "economy.account.credit"
+      },
+      {
+        "name": "activity.record"
+      },
+      {
+        "name": "activity.query"
+      },
+      {
+        "name": "area.registerArea"
+      },
+      {
+        "name": "area.unregisterArea"
+      },
+      {
+        "name": "area.registerFeature"
+      },
+      {
+        "name": "gui.registerMenuItem"
+      }
     ]
   },
   "notes": "只租不卖；DebugBox/DebugText；area+activity+economy+gui 闭环；无自建审计/钱包表。"
