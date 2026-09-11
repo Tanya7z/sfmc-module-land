@@ -6,10 +6,7 @@
   "configKey": "land",
   "enabledByDefault": true,
   "canDisable": true,
-  "requires": [
-    "economy",
-    "activity-log"
-  ],
+  "requires": ["economy", "activity-log", "gui"],
   "permissions": [
     "config:read:land",
     "db:read:sfmc_lands",
@@ -39,7 +36,17 @@
     "service:land.guestbook.list",
     "service:land.guestbook.sign",
     "service:land.auditLog",
-    "service:land.openMainMenu",
+    "service:land.ui.detail",
+    "service:land.ui.renew",
+    "service:land.ui.previewExpand",
+    "service:land.ui.expand",
+    "service:land.ui.terminate",
+    "service:land.ui.perks",
+    "service:land.ui.togglePerk",
+    "service:land.ui.leaseDraft",
+    "service:land.ui.previewLease",
+    "service:land.ui.createLease",
+    "service:land.ui.teleportByName",
     "service:economy.account.get",
     "service:economy.account.debit",
     "service:economy.account.credit",
@@ -48,7 +55,9 @@
     "service:area.registerArea",
     "service:area.unregisterArea",
     "service:area.registerFeature",
-    "service:gui.registerMenuItem"
+    "service:gui.registerFeature",
+    "service:gui.unregisterFeature",
+    "service:gui.openScreen"
   ],
   "services": {
     "provides": [
@@ -206,13 +215,59 @@
         }
       },
       {
-        "name": "land.openMainMenu",
-        "input": {
-          "type": "object"
-        },
-        "output": {
-          "type": "object"
-        }
+        "name": "land.ui.detail",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      {
+        "name": "land.ui.renew",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      {
+        "name": "land.ui.previewExpand",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      {
+        "name": "land.ui.expand",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      {
+        "name": "land.ui.terminate",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      {
+        "name": "land.ui.perks",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      {
+        "name": "land.ui.togglePerk",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      {
+        "name": "land.ui.leaseDraft",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      {
+        "name": "land.ui.previewLease",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      {
+        "name": "land.ui.createLease",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      {
+        "name": "land.ui.teleportByName",
+        "input": { "type": "object" },
+        "output": { "type": "object" }
       }
     ],
     "requires": [
@@ -241,9 +296,15 @@
         "name": "area.registerFeature"
       },
       {
-        "name": "gui.registerMenuItem"
+        "name": "gui.registerFeature"
+      },
+      {
+        "name": "gui.unregisterFeature"
+      },
+      {
+        "name": "gui.openScreen"
       }
     ]
   },
-  "notes": "只租不卖；DebugBox/DebugText；area+activity+economy+gui 闭环；无自建审计/钱包表。"
+  "notes": "只租不卖；DebugBox/DebugText；area+activity+economy 闭环；玩家界面由声明式 JSON 定义。"
 }

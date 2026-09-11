@@ -9,11 +9,14 @@ import { cacheFindByPos, cacheHasPerk } from "./cache.js";
 import type { LandConfig } from "./config.js";
 import { pendingBoxes } from "./pending.js";
 import { previewColor, showLandHighlight } from "./debug-draw.js";
-import { openMainMenu } from "./gui-menu.js";
 import { handleCreateLease } from "./services.js";
 import { findLandByPos } from "./store.js";
+import { openLandUi } from "./ui.js";
 
-type Selection = { a?: { x: number; y: number; z: number }; dimension?: string };
+type Selection = {
+  a?: { x: number; y: number; z: number };
+  dimension?: string;
+};
 
 const selections = new Map<string, Selection>();
 
@@ -48,18 +51,20 @@ export function registerLandEvents(cleanups: Array<() => void>): void {
     }
   });
 
-  const interactCb = world.afterEvents.playerInteractWithBlock.subscribe((ev) => {
-    void onInteractBlock(
-      ev.player,
-      ev.block.typeId,
-      {
-        x: ev.block.location.x,
-        y: ev.block.location.y,
-        z: ev.block.location.z,
-      },
-      ev.block.dimension.id,
-    );
-  });
+  const interactCb = world.afterEvents.playerInteractWithBlock.subscribe(
+    (ev) => {
+      void onInteractBlock(
+        ev.player,
+        ev.block.typeId,
+        {
+          x: ev.block.location.x,
+          y: ev.block.location.y,
+          z: ev.block.location.z,
+        },
+        ev.block.dimension.id,
+      );
+    },
+  );
   cleanups.push(() => {
     try {
       world.afterEvents.playerInteractWithBlock.unsubscribe(interactCb);
@@ -152,7 +157,12 @@ async function onPlaceBlock(
   });
   if (res.ok) {
     Msg.success(`起租成功！契约领地 ${res.landId}`, player);
-    void openMainMenu(player);
+    void openLandUi(player).catch((error) => {
+      debug.w(
+        "LandEvents",
+        `打开领地 UI 失败: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    });
   } else {
     Msg.error(res.error ?? "起租失败", player);
   }
@@ -169,14 +179,20 @@ async function onInteractBlock(
   if (typeId === cfg.totem.item_type) {
     const land = await findLandByPos(dimension, loc.x, loc.y, loc.z);
     if (land && land.owner_id === player.id) {
-      void openMainMenu(player);
+      void openLandUi(player).catch((error) => {
+        debug.w(
+          "LandEvents",
+          `打开领地 UI 失败: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      });
       return;
     }
   }
 
   const inv = player.getComponent("minecraft:inventory");
   const slotIndex =
-    typeof (player as { selectedSlotIndex?: number }).selectedSlotIndex === "number"
+    typeof (player as { selectedSlotIndex?: number }).selectedSlotIndex ===
+    "number"
       ? (player as { selectedSlotIndex: number }).selectedSlotIndex
       : 0;
   const slot = inv?.container?.getItem(slotIndex);
@@ -185,7 +201,10 @@ async function onInteractBlock(
   const sel = selections.get(player.id) ?? {};
   if (!sel.a || sel.dimension !== dimension) {
     selections.set(player.id, { a: loc, dimension });
-    Msg.info(`已选定点 A (${loc.x},${loc.y},${loc.z})，再点一次设定点 B`, player);
+    Msg.info(
+      `已选定点 A (${loc.x},${loc.y},${loc.z})，再点一次设定点 B`,
+      player,
+    );
     return;
   }
 
@@ -207,7 +226,12 @@ async function onInteractBlock(
   });
   pendingBoxes.set(player.id, { box, dimension });
   Msg.info("预览已挂载。打开 !land 控制台 → 起租向导 确认契约。", player);
-  void openMainMenu(player);
+  void openLandUi(player, "land.lease").catch((error) => {
+    debug.w(
+      "LandEvents",
+      `打开起租 UI 失败: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  });
 }
 
 function isHostile(typeId: string): boolean {
@@ -227,7 +251,11 @@ function isHostile(typeId: string): boolean {
     "minecraft:ravager",
     "minecraft:warden",
   ];
-  return hostile.includes(typeId) || typeId.includes("zombie") || typeId.includes("skeleton");
+  return (
+    hostile.includes(typeId) ||
+    typeId.includes("zombie") ||
+    typeId.includes("skeleton")
+  );
 }
 
 /** 供 heal 增益：周期给区域内玩家短暂再生（轻量）。 */
@@ -235,7 +263,12 @@ export function startHealTicker(cleanups: Array<() => void>): void {
   const runId = system.runInterval(() => {
     for (const p of world.getAllPlayers()) {
       try {
-        const hit = cacheFindByPos(p.dimension.id, p.location.x, p.location.y, p.location.z);
+        const hit = cacheFindByPos(
+          p.dimension.id,
+          p.location.x,
+          p.location.y,
+          p.location.z,
+        );
         if (!hit || hit.row.status !== "active") continue;
         if (!cacheHasPerk(hit, "heal")) continue;
         p.addEffect("minecraft:regeneration", 40, {

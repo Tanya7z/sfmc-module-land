@@ -16,7 +16,6 @@ import {
   startHealTicker,
 } from "./events.js";
 import { pendingBoxes } from "./pending.js";
-import { bindGuiConfig, openMainMenu, tryRegisterGuiMenu } from "./gui-menu.js";
 import { runLeaseScan } from "./lease-scanner.js";
 import {
   bindLandConfig,
@@ -44,6 +43,8 @@ import {
   listEffectiveLandsInDimension,
   listPerks,
 } from "./store.js";
+import { bindLandUiConfig, landUiServices } from "./ui-services.js";
+import { openLandUi, registerLandUi, unregisterLandUi } from "./ui.js";
 
 const MODULE_ID = "land";
 
@@ -75,7 +76,12 @@ function registerCommands(): void {
       if (pendingBoxes.has(player.id)) {
         Msg.tips("检测到选点预览，请在控制台「起租向导」确认契约", player);
       }
-      void openMainMenu(player);
+      void openLandUi(player).catch((error) => {
+        debug.w(
+          "Land",
+          `打开领地 UI 失败: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      });
     },
     "打开领地租赁控制台",
     MODULE_ID,
@@ -102,7 +108,7 @@ ModuleRegistry.register({
     },
     async init() {
       bindLandConfig(getCfg);
-      bindGuiConfig(getCfg);
+      bindLandUiConfig(getCfg);
 
       try {
         const base = await config.get<number>("base_daily_rent");
@@ -219,15 +225,11 @@ ModuleRegistry.register({
       unprovide.push(
         service.provide("land.auditLog", (input) => handleAuditLog(input)),
       );
-      unprovide.push(
-        service.provide("land.openMainMenu", async (input) => {
-          const playerId = String(input.playerId ?? "");
-          const { world } = await import("@minecraft/server");
-          const player = world.getAllPlayers().find((p) => p.id === playerId);
-          if (!player) return { ok: false };
-          return openMainMenu(player);
-        }),
-      );
+      for (const [name, handler] of Object.entries(landUiServices)) {
+        unprovide.push(service.provide(name, handler));
+      }
+
+      await registerLandUi();
 
       // 每小时扫描欠租状态机（72000 ticks ≈ 1h）
       scanRunId = system.runInterval(() => {
@@ -241,10 +243,10 @@ ModuleRegistry.register({
         });
       }, 72_000);
 
-      void tryRegisterGuiMenu();
       debug.i("Land", `init ok grace=${landConfig.grace_period_days}d`);
     },
     cleanup() {
+      void unregisterLandUi().catch(() => undefined);
       for (const off of unprovide.splice(0, unprovide.length)) {
         try {
           off();
