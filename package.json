@@ -1,6 +1,6 @@
 {
   "name": "@sfmc-bds/module-land",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "SAPI module: 土地租赁契约（只租不卖）与庄园生态",
   "main": "sapi/src/index.ts",
