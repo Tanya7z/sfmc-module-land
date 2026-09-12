@@ -6,7 +6,7 @@
   "configKey": "land",
   "enabledByDefault": true,
   "canDisable": true,
-  "requires": ["economy", "activity-log", "gui"],
+  "requires": ["economy", "activity-log"],
   "permissions": [
     "config:read:land",
     "db:read:sfmc_lands",
@@ -54,10 +54,7 @@
     "service:activity.query",
     "service:area.registerArea",
     "service:area.unregisterArea",
-    "service:area.registerFeature",
-    "service:gui.registerFeature",
-    "service:gui.unregisterFeature",
-    "service:gui.openScreen"
+    "service:area.registerFeature"
   ],
   "services": {
     "provides": [
@@ -294,15 +291,6 @@
       },
       {
         "name": "area.registerFeature"
-      },
-      {
-        "name": "gui.registerFeature"
-      },
-      {
-        "name": "gui.unregisterFeature"
-      },
-      {
-        "name": "gui.openScreen"
       }
     ]
   },

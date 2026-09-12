@@ -229,7 +229,7 @@ ModuleRegistry.register({
         unprovide.push(service.provide(name, handler));
       }
 
-      await registerLandUi();
+      registerLandUi();
 
       // 每小时扫描欠租状态机（72000 ticks ≈ 1h）
       scanRunId = system.runInterval(() => {
@@ -246,7 +246,7 @@ ModuleRegistry.register({
       debug.i("Land", `init ok grace=${landConfig.grace_period_days}d`);
     },
     cleanup() {
-      void unregisterLandUi().catch(() => undefined);
+      unregisterLandUi();
       for (const off of unprovide.splice(0, unprovide.length)) {
         try {
           off();

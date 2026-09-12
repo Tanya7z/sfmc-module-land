@@ -2,7 +2,9 @@
  * land 纯逻辑单元测试（不依赖 Minecraft 运行时）。
  */
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
+import { fileURLToPath } from "node:url";
 import { aabbIntersects, blockVolume, footprintBlocks, normalizeAabb, totemBoxFromCore } from "../sapi/src/aabb.ts";
 import { DEFAULT_LAND_CONFIG, mergeLandConfig } from "../sapi/src/config.ts";
 import {
@@ -98,5 +100,23 @@ describe("land identity", () => {
     // 纯文档级守卫：确保设计常量日毫秒与宽限期默认值仍为只租不卖
     assert.equal(DAY_MS, 86_400_000);
     assert.equal(DEFAULT_LAND_CONFIG.grace_period_days, 7);
+  });
+});
+
+describe("land manifest", () => {
+  it("声明式 UI 直接使用 SDK，不再依赖 gui 模块", () => {
+    const manifest = JSON.parse(
+      readFileSync(
+        fileURLToPath(new URL("../sapi/manifest.json", import.meta.url)),
+        "utf8",
+      ),
+    ) as {
+      requires: string[];
+      permissions: string[];
+      services: { requires: Array<{ name: string }> };
+    };
+    assert.ok(!manifest.requires.includes("gui"));
+    assert.ok(!manifest.services.requires.some((item) => item.name.startsWith("gui.")));
+    assert.ok(!manifest.permissions.some((item) => item.startsWith("service:gui.")));
   });
 });
